@@ -47,4 +47,5 @@ if __name__ == '__main__':
         [['uid', 'year', 'composite_score']]
 
     # write score without decimal place
-    submission.to_csv('data/submission.csv', float_format='%.0f', index=False)
+    submission.to_csv(os.path.join('data', 'submission.csv'),\
+        float_format='%.0f', index=False)
