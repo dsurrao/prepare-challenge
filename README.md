@@ -1,6 +1,11 @@
 # about
 code submission for [PREPARE](https://www.drivendata.org/competitions/300/competition-nih-alzheimers-sdoh-2/page/928/) challenge.
 
+# virtual env
+python -m venv venv
+source venv/bin/activate     
+pip install -r requirements.txt
+
 # data
 This program reads data from a `data` directory. It expects the following files:
 - train_features.csv

@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import os
-from average_score_method import make_prediction
+from feature_selection_method import make_prediction
+# from average_score_method import make_prediction
 
 if __name__ == '__main__':
     # read input
