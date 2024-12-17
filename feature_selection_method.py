@@ -9,13 +9,10 @@ def make_prediction(train_features, train_labels, test_features):
     features = pd.concat([train_features, test_features]).reset_index()
 
     # create transformed year columns
-    features['rjob_end_03_years_since'] = features['rjob_end_03'].apply(\
-        years_since)
-    features['rjob_end_12_years_since'] = features['rjob_end_12'].apply(\
-        years_since)
-    features['a16a_12_years_since'] = features['a16a_12'].apply(\
-        years_since)
-    features.drop(['rjob_end_03', 'rjob_end_12', 'a16a_12'], axis=1, inplace=True)
+    year_columns = ['rjob_end_03', 'rjob_end_12', 'a16a_12']
+    for col in year_columns:
+        features[f'{col}_years_since'] = features[col].apply(years_since)
+    features.drop(year_columns, axis=1, inplace=True)
 
     # scale all incomes between 0 and 1
     income_columns = ['rearnings_03', 'rearnings_12', 'searnings_03',\
