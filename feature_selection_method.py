@@ -8,15 +8,25 @@ from feature_encoder import get_features_encoded
 def make_prediction(train_features, train_labels, test_features):
     features = pd.concat([train_features, test_features]).reset_index()
 
-    '''
-    create transformed year columns
-    '''
+    # create transformed year columns
     features['rjob_end_03_years_since'] = features['rjob_end_03'].apply(\
-        years_from_today)
+        years_since)
     features['rjob_end_12_years_since'] = features['rjob_end_12'].apply(\
-        years_from_today)
+        years_since)
     features['a16a_12_years_since'] = features['a16a_12'].apply(\
-        years_from_today)
+        years_since)
+    features.drop(['rjob_end_03', 'rjob_end_12', 'a16a_12'], axis=1, inplace=True)
+
+    # scale all incomes between 0 and 1
+    income_columns = ['rearnings_03', 'rearnings_12', 'searnings_03',\
+        'searnings_12', 'hincome_03', 'hincome_12', 'hinc_business_03',\
+        'hinc_business_12', 'hinc_rent_03', 'hinc_rent_12', 'hinc_assets_03',\
+        'hinc_assets_12', 'hinc_cap_03', 'hinc_cap_12', 'rinc_pension_03',\
+        'rinc_pension_12', 'sinc_pension_03', 'sinc_pension_12']
+    for col in income_columns:
+        features[f'{col}_scaled'] = features[col].apply(scaled_value,\
+            args=(features[col].max(), ))
+    features.drop(income_columns, axis=1, inplace=True)
 
     # one hot encode categorical variables
     categorical_vars = get_categorical_vars()
@@ -75,6 +85,10 @@ def get_categorical_vars():
         'rjobend_reason_12', 'rrelgimp_03', 'rrelgimp_12', 'rrfcntx_m_12',\
         'rsocact_m_12', 'rrelgwk_12', 'a22_12', 'a33b_12', 'a34_12', 'j11_12']
 
-def years_from_today(year) -> int | None:
+def years_since(year) -> int | None:
     if year != None:
         return datetime.now().year - year
+
+def scaled_value(value, max) -> float | None:
+    if value != None and max != None:
+        return value/max
