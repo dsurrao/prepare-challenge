@@ -16,7 +16,8 @@ if __name__ == '__main__':
     # prepare submission file
     submission_format = pd.read_csv(os.path.join('data', 'submission_format.csv'))\
         [['uid', 'year']]
-    submission = submission_format.merge(predicted_scores, on='uid')\
+    submission = submission_format.merge(predicted_scores,\
+        on=['uid', 'year'])\
         [['uid', 'year', 'composite_score']]
 
     # write score without decimal place
