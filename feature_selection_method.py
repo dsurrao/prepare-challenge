@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.feature_selection import VarianceThreshold
 from datetime import datetime
-from feature_encoder import get_features_encoded
+from feature_encoder import get_features_onehot_encoded, get_features_ordinal_encoded
 
 def make_prediction(train_features, train_labels, test_features):
     # 'year' and 'composite_score' columns will be added to return value
@@ -21,17 +21,20 @@ def make_prediction(train_features, train_labels, test_features):
                 if col not in exclude_columns]],\
         test_features_and_years]).reset_index()
 
-    # create transformed year columns
-    composite_score_year = 2021 # date of latest label values
+    # transformed year columns to 'years since'
     year_columns = ['rjob_end_03', 'rjob_end_12', 'a16a_12']
     for col in year_columns:
-        features[f'{col}_years_since'] = features[col].apply(\
-            years_since, args=(composite_score_year, ))
+        features[f'{col}_years_since'] = features['year'] - features[col]
     features.drop(year_columns, axis=1, inplace=True)
 
     # one hot encode categorical variables
-    categorical_vars = get_categorical_vars()
-    features_encoded = get_features_encoded(features, categorical_vars)
+    categorical_vars = get_categorical_vars_for_onehot_encoding()
+    features_encoded = get_features_onehot_encoded(features, categorical_vars)
+
+    # one hot encode categorical variables
+    categorical_vars = get_categorical_vars_for_ordinal_encoding()
+    features_encoded = get_features_ordinal_encoded(features_encoded, categorical_vars)
+
     # skip new index column and 'uid' column
     exclude_columns = ['index', 'uid']
     features_encoded = features_encoded[\
@@ -69,21 +72,22 @@ def make_prediction(train_features, train_labels, test_features):
 
     return predicted_scores
 
-def get_categorical_vars():
+def get_categorical_vars_for_onehot_encoding():
     return ['age_03', 'age_12', 'urban_03', 'urban_12',\
-        'married_03', 'married_12', 'edu_gru_03', 'edu_gru_12',\
+        'married_03', 'married_12',\
         'n_living_child_03',\
-        'n_living_child_12', 'glob_hlth_03', 'glob_hlth_12', 'bmi_03',\
-        'bmi_12', 'decis_famil_03', 'decis_famil_12', 'decis_personal_03',\
+        'n_living_child_12', \
+        'decis_famil_03', 'decis_famil_12', 'decis_personal_03',\
         'decis_personal_12', 'employment_03', 'employment_12',\
         'satis_ideal_12',\
         'satis_excel_12', 'satis_fine_12', 'cosas_imp_12',\
         'wouldnt_change_12',\
-        'memory_12', 'ragender', 'rameduc_m', 'rafeduc_m', 'sgender_03',\
+        'ragender', 'rameduc_m', 'rafeduc_m', 'sgender_03',\
         'sgender_12', 'rjlocc_m_03', 'rjlocc_m_12', 'rjobend_reason_03',\
-        'rjobend_reason_12', 'rrelgimp_03', 'rrelgimp_12', 'rrfcntx_m_12',\
-        'rsocact_m_12', 'rrelgwk_12', 'a22_12', 'a33b_12', 'a34_12', 'j11_12']
+        'rjobend_reason_12', \
+        'rrelgwk_12', 'a22_12', 'a33b_12', 'a34_12', 'j11_12']
 
-def years_since(year, composite_score_year) -> int | None:
-    if year != None:
-        return composite_score_year - year
+def get_categorical_vars_for_ordinal_encoding():
+    return ['edu_gru_03', 'edu_gru_12', 'glob_hlth_03', 'glob_hlth_12',\
+        'bmi_03', 'bmi_12', 'rrelgimp_03', 'rrelgimp_12','rsocact_m_12',\
+        'rrfcntx_m_12','memory_12']
