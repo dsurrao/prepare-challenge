@@ -1,9 +1,9 @@
 import pandas as pd
-from sklearn import preprocessing
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 
 # one-hot encode categorical variables
 def get_features_onehot_encoded(features, categorical_vars):
-    enc = preprocessing.OneHotEncoder()
+    enc = OneHotEncoder()
     X = features[categorical_vars]
     enc.fit(X)
     features_transformed = enc.transform(X).toarray()
@@ -21,7 +21,7 @@ def get_features_onehot_encoded(features, categorical_vars):
 
 # ordinal encode categorical variables
 def get_features_ordinal_encoded(features, categorical_vars):
-    enc = preprocessing.OrdinalEncoder()
+    enc = OrdinalEncoder()
     X = features[categorical_vars]
     enc.fit(X)
     features_transformed = enc.transform(X)

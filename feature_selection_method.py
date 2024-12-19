@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.feature_selection import VarianceThreshold
 from datetime import datetime
-from feature_encoder import get_features_onehot_encoded, get_features_ordinal_encoded
+from feature_encoder import get_features_onehot_encoded,\
+    get_features_ordinal_encoded
 
 def make_prediction(train_features, train_labels, test_features):
     # 'year' and 'composite_score' columns will be added to return value
@@ -39,13 +40,8 @@ def make_prediction(train_features, train_labels, test_features):
     exclude_columns = ['index', 'uid']
     features_encoded = features_encoded[\
         [col for col in features_encoded.columns if col not in exclude_columns]]
-    
-    # remove low variance features
-    probability_of_same_value = 0.7
-    sel = VarianceThreshold(\
-        threshold=(probability_of_same_value * (1 - probability_of_same_value)))
-    selected_features_encoded = pd.DataFrame(
-        sel.fit_transform(features_encoded))
+
+    selected_features_encoded = features_encoded
     
     # build features
     train_features_encoded = selected_features_encoded[:len(train_features_and_labels)]
@@ -59,6 +55,7 @@ def make_prediction(train_features, train_labels, test_features):
     # NaN values.
     est = HistGradientBoostingRegressor().fit(\
         train_features_processed, train_labels_processed)
+    print(f'score: {est.score(train_features_processed, train_labels_processed)}')
 
     # make predictions
     test_features_encoded = selected_features_encoded[len(train_features_and_labels):]
@@ -79,10 +76,9 @@ def get_categorical_vars_for_onehot_encoding():
         'n_living_child_12', \
         'decis_famil_03', 'decis_famil_12', 'decis_personal_03',\
         'decis_personal_12', 'employment_03', 'employment_12',\
-        'satis_ideal_12',\
-        'satis_excel_12', 'satis_fine_12', 'cosas_imp_12',\
+        'cosas_imp_12',\
         'wouldnt_change_12',\
-        'ragender', 'rameduc_m', 'rafeduc_m', 'sgender_03',\
+        'ragender',  'sgender_03',\
         'sgender_12', 'rjlocc_m_03', 'rjlocc_m_12', 'rjobend_reason_03',\
         'rjobend_reason_12', \
         'rrelgwk_12', 'a22_12', 'a33b_12', 'a34_12', 'j11_12']
@@ -90,4 +86,5 @@ def get_categorical_vars_for_onehot_encoding():
 def get_categorical_vars_for_ordinal_encoding():
     return ['edu_gru_03', 'edu_gru_12', 'glob_hlth_03', 'glob_hlth_12',\
         'bmi_03', 'bmi_12', 'rrelgimp_03', 'rrelgimp_12','rsocact_m_12',\
-        'rrfcntx_m_12','memory_12']
+        'rrfcntx_m_12','memory_12','satis_ideal_12',\
+        'satis_excel_12', 'satis_fine_12', 'rameduc_m', 'rafeduc_m']
