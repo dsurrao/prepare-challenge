@@ -31,7 +31,7 @@ def make_prediction(train_features, train_labels, test_features):
     categorical_vars = get_categorical_vars_for_onehot_encoding()
     features_encoded = get_features_onehot_encoded(features, categorical_vars)
 
-    # one hot encode categorical variables
+    # ordinal encode categorical variables
     categorical_vars = get_categorical_vars_for_ordinal_encoding()
     features_encoded = get_features_ordinal_encoded(features_encoded, categorical_vars)
 

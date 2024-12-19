@@ -19,6 +19,7 @@ def get_features_onehot_encoded(features, categorical_vars):
 
     return features_encoded
 
+# ordinal encode categorical variables
 def get_features_ordinal_encoded(features, categorical_vars):
     enc = preprocessing.OrdinalEncoder()
     X = features[categorical_vars]
