@@ -51,10 +51,15 @@ def make_prediction(train_features, train_labels, test_features):
     # labels
     train_labels_processed = train_features_and_labels['composite_score']
 
-    # pass train features and labels to classifier. this classifier accepts
-    # NaN values.
-    est = HistGradientBoostingRegressor().fit(\
-        train_features_processed, train_labels_processed)
+    # Tune hyperparameters, then pass train features and labels to classifier.
+    # This classifier accepts NaN values.
+    common_params = {
+        "learning_rate": 0.3,
+        "scoring": "neg_root_mean_squared_error",
+    }
+    est = HistGradientBoostingRegressor(**common_params).fit(\
+        train_features_processed, train_labels_processed)    
+    print(f'params: {est.get_params()}')
     print(f'score: {est.score(train_features_processed, train_labels_processed)}')
 
     # make predictions
