@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.feature_selection import VarianceThreshold
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import root_mean_squared_error
 from datetime import datetime
 from feature_encoder import get_features_onehot_encoded,\
     get_features_ordinal_encoded
@@ -54,13 +56,26 @@ def make_prediction(train_features, train_labels, test_features):
     # Tune hyperparameters, then pass train features and labels to classifier.
     # This classifier accepts NaN values.
     common_params = {
-        "learning_rate": 0.3,
-        "scoring": "neg_root_mean_squared_error",
+        "learning_rate": 0.1,
+        "max_iter": 300
     }
-    est = HistGradientBoostingRegressor(**common_params).fit(\
-        train_features_processed, train_labels_processed)    
-    print(f'params: {est.get_params()}')
-    print(f'score: {est.score(train_features_processed, train_labels_processed)}')
+    hgbt = HistGradientBoostingRegressor(**common_params)
+
+    # create train/test split of data for performance evaluation
+    X_train, X_test, y_train, y_test = train_test_split(
+        train_features_processed, train_labels_processed, test_size=0.2,\
+        random_state=42)
+    hgbt.fit(X_train, y_train)
+
+    # make predictions on split and evaluate rmse
+    y_pred = hgbt.predict(X_test)
+    rmse = root_mean_squared_error(y_test, y_pred)
+    print(f'Root mean squared error on the test set: {rmse}')
+
+    # now fit with the full training set
+    est = hgbt.fit(train_features_processed, train_labels_processed)
+    print('R2 score on full training set: '\
+     + f'{est.score(train_features_processed, train_labels_processed)}')
 
     # make predictions
     test_features_encoded = selected_features_encoded[len(train_features_and_labels):]
