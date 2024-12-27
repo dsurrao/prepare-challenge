@@ -1,6 +1,8 @@
 # about
 code submission for [PREPARE](https://www.drivendata.org/competitions/300/competition-nih-alzheimers-sdoh-2/page/928/) challenge.
 
+more on my thought process during development [here](https://www.dominicsurrao.com/tech-tips/prepare-challenge).
+
 # virtual env
 python -m venv venv
 source venv/bin/activate     
